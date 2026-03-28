@@ -3,9 +3,12 @@ import mongoose from 'mongoose'
 import userRouter from './routers/userRouter.js'
 import authenticate from './middlewares/authenticate.js'
 import productRouter from './routers/productRouter.js'
+import dotenv from 'dotenv'
+dotenv.config()
 
 // Changed from mongodb+srv format to standard format to bypass local DNS querySrv errors
-const mongoDBURI = "mongodb+srv://admin:1234@cluster0.aojxybi.mongodb.net/?appName=Cluster0"
+const mongoDBURI = process.env.MONGODB_URI
+
 mongoose.connect(mongoDBURI).then(
     ()=>{
         console.log("Connected to MongoDB successfully")
