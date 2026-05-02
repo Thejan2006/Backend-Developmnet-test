@@ -15,6 +15,7 @@ export async function createProduct(req,res){
     }
 
     try{
+        console.log(req.body);
 
         const existingProduct = await Product.findOne( {productId : req.body.productId} )
 

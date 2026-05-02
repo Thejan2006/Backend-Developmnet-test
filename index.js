@@ -1,9 +1,11 @@
-import express from 'express'
+ import express from 'express'
 import mongoose from 'mongoose'
 import userRouter from './routers/userRouter.js'
-import authenticate from './middlewares/authenticate.js'
+import authenticate from './middleware/authenticate.js'
 import productRouter from './routers/productRouter.js'
 import dotenv from 'dotenv'
+
+
 
 dotenv.config();  // mongoDB connectivity section
 
@@ -14,8 +16,8 @@ const app = express()
 
 app.use(express.json())
 
-app.use(authenticate)
 
+app.use(authenticate)
 
 app.use("/users", userRouter)
 app.use("/products", productRouter)
@@ -29,5 +31,3 @@ app.listen(
 
 
 )
-
-

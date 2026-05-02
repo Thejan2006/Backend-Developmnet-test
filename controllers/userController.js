@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken"
 export async function createUser(req,res){
 
     try{
+        console.log(req.body);
 
         const user = await User.findOne( {email : req.body.email} )
 
@@ -16,9 +17,10 @@ export async function createUser(req,res){
 
         const newUser = new User({
             email : req.body.email,
-            firstName : req.body.firstName,
-            lastName : req.body.lastName,
-            password : passwordHash
+            firstname : req.body.firstName,
+            lastname : req.body.lastName,
+            password : passwordHash,
+            age: req.body.age
         })
 
         await newUser.save()

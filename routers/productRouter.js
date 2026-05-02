@@ -14,4 +14,5 @@ productRouter.get("/search", (req,res)=>{
 productRouter.get("/:productId" , getProductById)
 productRouter.delete("/:productId" , deleteProduct)
 productRouter.put("/:productId" , updateProduct)
+
 export default productRouter
