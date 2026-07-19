@@ -1,3 +1,0 @@
-node_modules
-package-lock.json
-mongoDBURI = "mongodb+srv://admin:1234@cluster1.qa74vqp.mongodb.net/?appName=Cluster1ter0"
