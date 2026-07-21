@@ -11,6 +11,8 @@ import reviewRouter from "./routes/review.routes.js"
 import adminRouter from "./routes/admin.routes.js"
 import notFound from "./middleware/not-found.middleware.js"
 import errorHandler from "./middleware/error.middleware.js"
+import dns from "dns";
+dns.setServers(["8.8.8.8"]);
 
 dotenv.config()
 
