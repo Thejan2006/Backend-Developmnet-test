@@ -2,6 +2,8 @@ import dotenv from "dotenv"
 import connectDB from "../config/db.js"
 import User from "../models/user.model.js"
 import { hashPassword } from "../services/auth.service.js"
+import dns from "dns";
+dns.setServers(["8.8.8.8"]);
 
 dotenv.config()
 
