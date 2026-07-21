@@ -82,7 +82,7 @@ export const getReviews = async (req, res) => {
 
         const [totalReviews, reviews] = await Promise.all([
             Review.countDocuments(filter),
-            Review.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit)
+            Review.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit).lean()
         ])
 
         return res.status(200).json({
@@ -236,3 +236,4 @@ export const deleteReview = async (req, res) => {
         })
     }
 }
+

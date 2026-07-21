@@ -1,4 +1,5 @@
 import express from "express"
+import mongoose from "mongoose"
 import helmet from "helmet"
 import cors from "cors"
 import morgan from "morgan"
@@ -15,7 +16,12 @@ dotenv.config()
 
 const app = express()
 const PORT = process.env.PORT || 3003
-const clientUrl = process.env.CLIENT_URL || "http://localhost:3000"
+const allowedOrigins = (process.env.CLIENT_URL || "http://localhost:3000")
+    .split(",")
+    .map((origin) => origin.trim())
+    .filter(Boolean)
+
+let server
 
 const apiLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
@@ -28,9 +34,11 @@ const apiLimiter = rateLimit({
     }
 })
 
+app.disable("x-powered-by")
+app.set("trust proxy", 1)
 app.use(helmet())
 app.use(cors({
-    origin: clientUrl,
+    origin: allowedOrigins.length === 1 ? allowedOrigins[0] : allowedOrigins,
     credentials: true
 }))
 app.use(express.json({ limit: "10kb" }))
@@ -51,10 +59,36 @@ app.use("/api/admin/reviews", adminRouter)
 app.use(notFound)
 app.use(errorHandler)
 
+const shutdown = async (signal) => {
+    console.log(`Received ${signal}. Shutting down gracefully...`)
+
+    if (server) {
+        server.close(async () => {
+            try {
+                await mongoose.connection.close()
+                process.exit(0)
+            } catch (error) {
+                console.error("Error during shutdown", error)
+                process.exit(1)
+            }
+        })
+        return
+    }
+
+    try {
+        await mongoose.connection.close()
+    } finally {
+        process.exit(0)
+    }
+}
+
+process.on("SIGINT", () => shutdown("SIGINT"))
+process.on("SIGTERM", () => shutdown("SIGTERM"))
+
 const startServer = async () => {
     await connectDB()
 
-    app.listen(PORT, () => {
+    server = app.listen(PORT, () => {
         console.log("Server started successfully on port " + PORT)
     })
 }
