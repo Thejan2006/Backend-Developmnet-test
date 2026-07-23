@@ -6,9 +6,14 @@ import morgan from "morgan"
 import rateLimit from "express-rate-limit"
 import dotenv from "dotenv"
 import connectDB from "./config/db.js"
+// import userRoutes from "./routes/user.routes.js"
+
 import authRouter from "./routes/auth.routes.js"
 import reviewRouter from "./routes/review.routes.js"
 import adminRouter from "./routes/admin.routes.js"
+import productRouter from "./routes/product.routes.js" 
+import orderRouter from "./routes/order.routes.js"     
+
 import notFound from "./middleware/not-found.middleware.js"
 import errorHandler from "./middleware/error.middleware.js"
 import dns from "dns";
@@ -18,7 +23,7 @@ dotenv.config()
 
 const app = express()
 const PORT = process.env.PORT || 3003
-const allowedOrigins = (process.env.CLIENT_URL || "http://localhost:3000")
+const allowedOrigins = (process.env.CLIENT_URL || "http://localhost:5173")
     .split(",")
     .map((origin) => origin.trim())
     .filter(Boolean)
@@ -54,10 +59,13 @@ app.get("/health", (req, res) => {
     })
 })
 
-app.use("/api/auth", authRouter)
+// --- API ROUTES MOUNTING ---
+app.use("/api/auth", authRouter)       // Frontend eke /users/login wage yawana nisa /api/users danna
+app.use("/api/products", productRouter) // Products walata
+app.use("/api/orders", orderRouter)     // Orders walata
 app.use("/api/reviews", reviewRouter)
-app.use("/api/admin/reviews", adminRouter)
-
+app.use("/api/admin", adminRouter)
+// app.use("/api/users", userRoutes)
 app.use(notFound)
 app.use(errorHandler)
 
