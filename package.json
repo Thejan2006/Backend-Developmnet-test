@@ -1,7 +1,7 @@
 {
     "name": "i-computers-backend-batch-eleven",
     "version": "1.0.0",
-    "description": "",
+    "description": "A Node.js backend API built with Express.js and MongoDB for an e-commerce platform. This API handles user authentication, product management, and order processing.",
     "main": "index.js",
     "type": "module",
     "scripts": {
@@ -16,16 +16,24 @@
         "axios": "^1.18.0",
         "bcrypt": "^6.0.0",
         "cors": "^2.8.6",
-        "dotenv": "^17.3.1",
+        "dotenv": "^17.4.2",
         "express": "^5.2.1",
         "express-rate-limit": "^8.6.0",
         "express-validator": "^7.3.2",
         "helmet": "^8.3.0",
         "jsonwebtoken": "^9.0.3",
         "mongodb": "^7.5.0",
-        "mongoose": "^9.2.4",
+        "mongoose": "^9.8.0",
         "morgan": "^1.11.0",
         "nodemailer": "^9.0.1",
         "nodemon": "^3.1.14"
-    }
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/Thejan2006/Backend-Developmnet-test.git"
+    },
+    "bugs": {
+        "url": "https://github.com/Thejan2006/Backend-Developmnet-test/issues"
+    },
+    "homepage": "https://github.com/Thejan2006/Backend-Developmnet-test#readme"
 }
