@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken"
+import User from "../models/user.model.js" // 👈 User model එක import කරගන්න
 
-const authMiddleware = (req, res, next) => {
+const authMiddleware = async (req, res, next) => { // async කරන්න
     const authHeader = req.header("Authorization")
 
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -15,12 +16,23 @@ const authMiddleware = (req, res, next) => {
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET)
 
+        // 👈 Token එකේ ID එකෙන් කෙලින්ම Database එකෙන් Current User ව ගන්න.
+        // එවිට MongoDB Compass එකේ role එක වෙනස් කළ සැණින් එය මෙහිදී වැඩ කරයි!
+        const user = await User.findById(decoded.id)
+
+        if (!user) {
+            return res.status(401).json({
+                success: false,
+                message: "User not found"
+            })
+        }
+
         req.user = {
-            id: decoded.id,
-            name: decoded.name,
-            email: decoded.email,
-            role: decoded.role,
-            profileImage: decoded.profileImage || ""
+            id: user._id,
+            name: user.name,
+            email: user.email,
+            role: user.role, // 👈 Database එකේ තියෙන අලුත්ම role එක මෙතැනට වැටේ
+            profileImage: user.profileImage || ""
         }
 
         next()
