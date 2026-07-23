@@ -6,12 +6,12 @@ const adminMiddleware = (req, res, next) => {
         })
     }
 
-    if (req.user.role !== "admin") {
-        return res.status(403).json({
-            success: false,
-            message: "Forbidden"
-        })
-    }
+    if (!req.user.isAdmin) {
+    return res.status(403).json({
+        success: false,
+        message: "Forbidden"
+    })
+}
 
     return next()
 }
