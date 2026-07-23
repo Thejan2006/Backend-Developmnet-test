@@ -77,7 +77,10 @@ export async function loginUser(req,res){
         if(isPasswordValid){
 
             const token = jwt.sign(
+
                 {
+                    _id : user._id,         // 👈 මේක අනිවාර්යයෙන්ම එකතු කරන්න
+                    id : user._id,
                     email : user.email,
                     firstName : user.firstName,
                     lastName : user.lastName,
