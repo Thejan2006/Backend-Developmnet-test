@@ -6,6 +6,7 @@ const formatReview = (review) => ({
     userId: typeof review.user === "object" && review.user?._id ? review.user._id.toString() : review.user.toString(),
     userName: review.userName,
     userProfileImage: review.userProfileImage || "",
+    productId: review.productId || "",
     rating: review.rating,
     comment: review.comment,
     status: review.status,
@@ -24,53 +25,55 @@ const parsePagination = (query) => {
 export const createReview = async (req, res) => {
     try {
         if (!req.user?.id) {
-            return res.status(401).json({
-                success: false,
-                message: "Unauthorized"
-            })
+            return res.status(401).json({ success: false, message: "Unauthorized" })
         }
 
         const user = await User.findById(req.user.id)
-
         if (!user) {
-            return res.status(404).json({
-                success: false,
-                message: "User not found"
-            })
+            return res.status(404).json({ success: false, message: "User not found" })
         }
 
-        const existingReview = await Review.findOne({ user: user._id })
+        // 🟢 Frontend එකෙන් Body එකෙන් එවන productId එක නිවැරදිව ලබා ගැනීම
+        const { rating, comment, productId } = req.body
+
+        if (!productId) {
+            return res.status(400).json({ success: false, message: "Product ID is required in request body" })
+        }
+
+        if (!comment || typeof comment !== "string") {
+            return res.status(400).json({ success: false, message: "Valid comment is required" })
+        }
+
+        // 🟢 මෙම User සහ productId එක සඳහා දැනටමත් Review එකක් ඇත්දැයි බැලීම
+        const existingReview = await Review.findOne({ user: user._id, productId })
 
         if (existingReview) {
-            return res.status(409).json({
-                success: false,
-                message: "You have already submitted a review"
-            })
+            return res.status(409).json({ success: false, message: "You have already submitted a review for this product" })
         }
-
-        const { rating, comment } = req.body
 
         const review = await Review.create({
             user: user._id,
             userName: user.name,
             userProfileImage: user.profileImage || "",
-            rating,
+            productId: productId, // අනිවාර්යයෙන්ම save වීම සඳහා
+            rating: Number(rating) || 5,
             comment: comment.trim(),
-            status: "pending"
+            status: "approved"
         })
 
         return res.status(201).json({
             success: true,
             message: "Review created successfully",
-            data: {
-                review: formatReview(review)
-            }
+            data: { review: formatReview(review) }
         })
     } catch (error) {
+        // 🟢 500 Error එක එන්න හේතුව VS Code Terminal එකේ Print වීම සඳහා
+        console.error("🔴 DETAILED REVIEW CREATE ERROR:", error);
+        
         return res.status(500).json({
             success: false,
             message: "Server error",
-            error: process.env.NODE_ENV === "development" ? error.message : undefined
+            error: error.message
         })
     }
 }
@@ -79,6 +82,10 @@ export const getReviews = async (req, res) => {
     try {
         const { page, limit, skip } = parsePagination(req.query)
         const filter = { status: "approved" }
+
+        if (req.query.productId || req.params.productId) {
+            filter.productId = req.query.productId || req.params.productId
+        }
 
         const [totalReviews, reviews] = await Promise.all([
             Review.countDocuments(filter),
@@ -97,10 +104,11 @@ export const getReviews = async (req, res) => {
             }
         })
     } catch (error) {
+        console.error("Get Reviews Error:", error)
         return res.status(500).json({
             success: false,
             message: "Server error",
-            error: process.env.NODE_ENV === "development" ? error.message : undefined
+            error: error.message
         })
     }
 }
@@ -127,10 +135,11 @@ export const getReviewById = async (req, res) => {
             }
         })
     } catch (error) {
+        console.error("Get Review By ID Error:", error)
         return res.status(500).json({
             success: false,
             message: "Server error",
-            error: process.env.NODE_ENV === "development" ? error.message : undefined
+            error: error.message
         })
     }
 }
@@ -167,8 +176,8 @@ export const updateReview = async (req, res) => {
         const updatedReview = await Review.findByIdAndUpdate(
             review._id,
             {
-                rating,
-                comment: comment.trim(),
+                rating: Number(rating) || review.rating,
+                comment: comment ? comment.trim() : review.comment,
                 status: isAdmin ? review.status : "pending"
             },
             {
@@ -185,10 +194,11 @@ export const updateReview = async (req, res) => {
             }
         })
     } catch (error) {
+        console.error("Update Review Error:", error)
         return res.status(500).json({
             success: false,
             message: "Server error",
-            error: process.env.NODE_ENV === "development" ? error.message : undefined
+            error: error.message
         })
     }
 }
@@ -229,11 +239,11 @@ export const deleteReview = async (req, res) => {
             data: {}
         })
     } catch (error) {
+        console.error("Delete Review Error:", error)
         return res.status(500).json({
             success: false,
             message: "Server error",
-            error: process.env.NODE_ENV === "development" ? error.message : undefined
+            error: error.message
         })
     }
 }
-
