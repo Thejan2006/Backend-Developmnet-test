@@ -11,7 +11,7 @@ export default function authenticate(req, res, next) {
 
     const token = header.replace("Bearer ", "")
 
-    // 🟢 JWT_SECRET_KEY වෙනුවට Login එකේ පාවිච්චි කරන නමම (JWT_SECRET) මෙතැනට දෙන්න
+    //  JWT_SECRET_KEY වෙනුවට Login එකේ පාවිච්චි කරන නමම (JWT_SECRET) මෙතැනට දෙන්න
     jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
         if (err) {
             return res.status(401).json({ message: "Invalid token please login again" })
