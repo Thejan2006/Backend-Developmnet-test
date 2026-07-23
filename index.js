@@ -23,10 +23,10 @@ dotenv.config()
 
 const app = express()
 const PORT = process.env.PORT || 3003
-const allowedOrigins = (process.env.CLIENT_URL || "http://localhost:5173")
+const allowedOrigins = (process.env.CLIENT_URL || "http://localhost:5173,https://frontend-development-test-aayg.vercel.app/")
     .split(",")
     .map((origin) => origin.trim())
-    .filter(Boolean)
+    .filter(Boolean);
 
 let server
 
