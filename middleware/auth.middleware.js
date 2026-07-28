@@ -14,8 +14,8 @@ const authMiddleware = async (req, res, next) => {
     const token = authHeader.split(" ")[1]
 
     try {
-        // 👈 JWT_SECRET_KEY විදිහට නම නිවැරදි කළා
-        const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY) 
+        
+        const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY || process.env.JWT_SECRET) 
 
         const user = await User.findById(decoded.id || decoded._id)
 
@@ -26,7 +26,7 @@ const authMiddleware = async (req, res, next) => {
             })
         }
 
-        // 👈 userController.js එකට ගැළපෙන විදිහට req.user එක හැදුවා
+        
         req.user = {
             id: user._id,
             email: user.email,
