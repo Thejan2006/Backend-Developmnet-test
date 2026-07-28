@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken"
-import User from "../models/user.model.js" // 👈 User model එක import කරගන්න
+import User from "../models/user.js" // 👈 Import එක user.js විදිහට හැදුවා
 
-const authMiddleware = async (req, res, next) => { // async කරන්න
+const authMiddleware = async (req, res, next) => {
     const authHeader = req.header("Authorization")
 
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -14,11 +14,10 @@ const authMiddleware = async (req, res, next) => { // async කරන්න
     const token = authHeader.split(" ")[1]
 
     try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET)
+        // 👈 JWT_SECRET_KEY විදිහට නම නිවැරදි කළා
+        const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY) 
 
-        // 👈 Token එකේ ID එකෙන් කෙලින්ම Database එකෙන් Current User ව ගන්න.
-        // එවිට MongoDB Compass එකේ role එක වෙනස් කළ සැණින් එය මෙහිදී වැඩ කරයි!
-        const user = await User.findById(decoded.id)
+        const user = await User.findById(decoded.id || decoded._id)
 
         if (!user) {
             return res.status(401).json({
@@ -27,12 +26,15 @@ const authMiddleware = async (req, res, next) => { // async කරන්න
             })
         }
 
+        // 👈 userController.js එකට ගැළපෙන විදිහට req.user එක හැදුවා
         req.user = {
             id: user._id,
-            name: user.name,
             email: user.email,
-            role: user.role, // 👈 Database එකේ තියෙන අලුත්ම role එක මෙතැනට වැටේ
-            profileImage: user.profileImage || ""
+            firstName: user.firstName,
+            lastName: user.lastName,
+            isAdmin: user.isAdmin,
+            isBlocked: user.isBlocked,
+            image: user.image
         }
 
         next()
