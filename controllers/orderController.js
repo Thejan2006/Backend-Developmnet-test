@@ -1,5 +1,6 @@
 import Order from "../models/order.js";
 import Product from "../models/product.js";
+import mongoose from "mongoose";
 
 export async function createOrder(req, res) {
     try {
@@ -20,8 +21,7 @@ export async function createOrder(req, res) {
             totalAmount: 0
         };
 
-        const lastOrder = await Order.findOne().sort({ date: -1 });
-
+        const lastOrder = await Order.findOne().sort({ _id: -1 });
         if (lastOrder && lastOrder.orderId) {
             const lastOrderId = lastOrder.orderId;
             const lastOrderNumberInString = lastOrderId.replace("ORD", "");
